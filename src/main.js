@@ -1,24 +1,48 @@
 import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.js'
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-`
+import { Navbar } from './components/Navbar'
 
-setupCounter(document.querySelector('#counter'))
+import { Home } from './pages/Home'
+import { About } from './pages/About'
+import { Labs } from './pages/Labs'
+import { History } from './pages/History'
+
+import { PhishingLab } from './labs/phishing'
+import { PasswordsLab } from './labs/passwords'
+import { MalwareLab } from './labs/malware'
+
+const routes = {
+  '/': Home,
+  '/labs': Labs,
+  '/about': About,
+  '/history': History,
+  '/labs/phishing': PhishingLab,
+  '/labs/passwords': PasswordsLab,
+  '/labs/malware': MalwareLab,
+}
+
+function render(component, container) {
+  const result = component()
+
+  if (typeof result === 'string') {
+    const wrapper = document.createElement('div')
+    wrapper.innerHTML = result
+    container.appendChild(wrapper)
+  } else {
+    container.appendChild(result)
+  }
+}
+
+function router() {
+  const path = location.hash.replace('#', '') || '/'
+  const Page = routes[path] || Home
+
+  const app = document.querySelector('#app')
+  app.innerHTML = ''
+
+  render(Navbar, app)
+  render(Page, app)
+}
+
+window.addEventListener('hashchange', router)
+window.addEventListener('load', router)
